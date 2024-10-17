@@ -1,10 +1,10 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ObserverRoom } from "./ObserverRoom";
 import { RoomWrapper } from "@/components/RoomWrapper";
 
-export default function Page() {
+const ObserverPage = () => {
   const params = useSearchParams();
   const roomName = params.get("roomName");
   const [roomNameInput, setRoomNameInput] = useState("");
@@ -39,7 +39,15 @@ export default function Page() {
 
   return (
     <RoomWrapper name={roomName} viewer="participant">
-      <ObserverRoom name={roomName} />
+      <ObserverRoom />
     </RoomWrapper>
+  );
+};
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ObserverPage />
+    </Suspense>
   );
 }

@@ -2,8 +2,9 @@
 import { useSearchParams } from "next/navigation";
 import { RoomWrapper } from "@/components/RoomWrapper";
 import { ParticipantRoom } from "./ParticipantRoom";
+import { Suspense } from "react";
 
-export default function Home() {
+const HomePage = () => {
   const params = useSearchParams();
   const roomName = params.get("roomName");
 
@@ -24,5 +25,13 @@ export default function Home() {
     <RoomWrapper name={roomName} viewer="participant">
       <ParticipantRoom />
     </RoomWrapper>
+  );
+};
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomePage />
+    </Suspense>
   );
 }
