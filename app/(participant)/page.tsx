@@ -22,7 +22,7 @@ export default function Home() {
   }
   return (
     <RoomWrapper name={roomName} viewer="participant">
-      <ParticipantRoom name={roomName} />
+      <ParticipantRoom />
     </RoomWrapper>
   );
 }
