@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 import {
   AccessToken,
-  AccessTokenOptions, VideoGrant
+  AccessTokenOptions,
+  VideoGrant,
 } from "livekit-server-sdk";
 
 const apiKey = process.env.LK_API_KEY;
@@ -26,12 +27,21 @@ export type LivekitInitResult = {
   serverUrl: string;
 };
 
-export type ViewerType = 'participant' | 'observer';
+export type ViewerType = "participant" | "observer";
 
 export async function POST(req: NextRequest) {
-  const roomName = req.nextUrl.searchParams.get('roomName');
-  const viewer = req.nextUrl.searchParams.get('viewer') || undefined as ViewerType | undefined;
-  
+  const { roomName, viewer } = (() => {
+    try {
+      const searchParams = req.nextUrl.searchParams ?? new URLSearchParams();
+      return {
+        roomName: searchParams.get("roomName"),
+        viewer: searchParams.get("viewer") as ViewerType,
+      };
+    } catch {
+      return {};
+    }
+  })();
+
   if (!roomName) {
     return NextResponse.json(
       {
@@ -93,7 +103,7 @@ export async function POST(req: NextRequest) {
       {
         identity: userId,
         name: viewer,
-        ttl: '3h',
+        ttl: "3h",
       },
       grant
     );
