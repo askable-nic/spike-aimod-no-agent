@@ -1,0 +1,8 @@
+{
+  "input_type": "URL_INPUT",
+  "name": "AI Agent",
+  "room_name": "HM1BLL",
+  "participant_identity": "ai_agent",
+  "participant_name": "AI Moderator",
+  "url": "https://askable-misc-public.s3.ap-southeast-2.amazonaws.com/dashboard_sounds/eofy-yeah-boi.mp3"
+}
