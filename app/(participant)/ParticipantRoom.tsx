@@ -1,7 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Track } from "livekit-client";
-import { RoomAudioRenderer, useRemoteParticipants, useRoomContext, useTracks } from "@livekit/components-react";
+import { RoomAudioRenderer, useRemoteParticipants, useRoomContext } from "@livekit/components-react";
 
 export const ParticipantRoom = () => {
   const room = useRoomContext();

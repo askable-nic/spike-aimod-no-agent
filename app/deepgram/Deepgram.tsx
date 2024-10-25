@@ -1,14 +1,10 @@
-import {
-  createClient,
-  DeepgramClient,
-  LiveTranscriptionEvents,
-} from "@deepgram/sdk";
+import { DeepgramClient, LiveTranscriptionEvents } from "@deepgram/sdk";
 import {
   useLocalParticipant,
   useRoomContext,
   ControlBar,
 } from "@livekit/components-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const Deepgram = ({ apiKey }: { apiKey: string }) => {
   const room = useRoomContext();
@@ -18,11 +14,14 @@ export const Deepgram = ({ apiKey }: { apiKey: string }) => {
   const stt = useRef<string[]>([]);
   const [lastMessage, setLastMessage] = useState<string | undefined>();
   const sttPreviewRef = useRef<HTMLPreElement | null>(null);
+  const stopRecordingTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const [recorderState, setRecorderState] = useState<
-    "idle" | "starting" | "recording"
+    "idle" | "starting" | "recording" | "finalising"
   >("idle");
-  const [sttState, setSttState] = useState<"idle" | "listening">("idle");
+  const [sttState, setSttState] = useState<"idle" | "listening" | "finalising">(
+    "idle"
+  );
 
   const micTrack = localParticipant.microphoneTrack;
   const micStream = micTrack?.audioTrack?.mediaStream;
@@ -30,12 +29,12 @@ export const Deepgram = ({ apiKey }: { apiKey: string }) => {
   useEffect(() => {
     if (micStream) {
       if (localParticipant.isMicrophoneEnabled) {
-        if (deepgram.current) {
+        if (micStream && deepgram.current) {
           const dgConnection = deepgram.current.listen.live({
             model: "nova",
             punctuate: true,
             channels: 1,
-            endpointing: 500,
+            // endpointing: ENDPOINT_DELAY,
             interim_results: false,
           });
 
@@ -52,6 +51,8 @@ export const Deepgram = ({ apiKey }: { apiKey: string }) => {
                 if (sttPreviewRef.current) {
                   sttPreviewRef.current.innerText = stt.current.join("\n");
                 }
+              } else if (transcript) {
+                console.log(data, transcript);
               }
             });
             setRecorderState("starting");
@@ -71,18 +72,28 @@ export const Deepgram = ({ apiKey }: { apiKey: string }) => {
           throw new Error("Deepgram client not initialized");
         }
       } else {
-        setSttState("idle");
         if (recorder.current) {
-          recorder.current.stop();
-          recorder.current = undefined;
-          setLastMessage(stt.current.join(" "));
-          stt.current = [];
-          if (sttPreviewRef.current) {
-            sttPreviewRef.current.innerText = "";
-          }
+          setRecorderState("finalising");
+          setSttState("finalising");
+          stopRecordingTimeout.current = setTimeout(() => {
+            if (recorder.current) {
+              recorder.current.stop();
+              recorder.current = undefined;
+            }
+            setLastMessage(stt.current.join(" "));
+            stt.current = [];
+            if (sttPreviewRef.current) {
+              sttPreviewRef.current.innerText = "";
+            }
+          }, 1000);
         }
       }
     }
+    return () => {
+      if (stopRecordingTimeout.current) {
+        clearTimeout(stopRecordingTimeout.current);
+      }
+    };
   }, [localParticipant.isMicrophoneEnabled, micStream]);
 
   return (
