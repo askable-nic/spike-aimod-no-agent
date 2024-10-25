@@ -40,6 +40,9 @@ const ObserverPage = () => {
   return (
     <RoomWrapper name={roomName} viewer="participant">
       <ObserverRoom />
+      <button className="btn btn-secondary">
+        Click this button
+      </button>
     </RoomWrapper>
   );
 };
