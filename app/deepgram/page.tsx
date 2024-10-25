@@ -41,12 +41,14 @@ const PageRoom = () => {
         className="input input-bordered w-full monospace"
         placeholder="API Key"
         name="dg-api-key"
+        value={dgApiKey}
       />
       <input
         type="text"
         className="input input-bordered w-full monospace"
         placeholder="Room Name"
         name="room-name"
+        value={roomName}
       />
       <button type="submit" className="btn">
         Submit
