@@ -112,6 +112,7 @@ export const Deepgram = ({ dgApiKey }: { dgApiKey: string }) => {
         return;
       }
       activeMic.current.stop();
+      activeMic.current.stream.getTracks().forEach((track) => track.stop());
       commitStt();
       sttTranscriptPreview.current!.value = "";
       submitTranscript(sttTranscript.current).finally(() => {
